@@ -4,6 +4,7 @@ import com.example.login_auth_api.domain.user.User;
 import com.example.login_auth_api.dto.LoginRequestDTO;
 import com.example.login_auth_api.dto.RegisterRequestDTO;
 import com.example.login_auth_api.dto.ResponseDTO;
+import com.example.login_auth_api.exceptions.UserNotFoundException;
 import com.example.login_auth_api.infra.security.TokenService;
 import com.example.login_auth_api.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,8 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequestDTO body){
-        User user = this.repository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
+    public ResponseEntity<ResponseDTO> login(@RequestBody LoginRequestDTO body){
+        User user = this.repository.findByEmail(body.email()).orElseThrow(UserNotFoundException::new);
         if(passwordEncoder.matches(body.password(),user.getPassword())){
             String token = tokenService.generateToken(user);
             return ResponseEntity.ok(new ResponseDTO(user.getName(), token));
@@ -35,7 +36,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegisterRequestDTO body){
+    public ResponseEntity<ResponseDTO> register(@RequestBody RegisterRequestDTO body){
         Optional<User> user = this.repository.findByEmail(body.email());
         if(user.isEmpty()){
             User newUser = new User();

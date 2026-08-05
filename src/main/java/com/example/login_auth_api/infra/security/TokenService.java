@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.login_auth_api.domain.user.User;
+import com.example.login_auth_api.exceptions.AuthenticationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,7 @@ public class TokenService {
             return token;
         }
         catch(JWTCreationException exception){
-            throw new RuntimeException("Error while authenticating");
+            throw new AuthenticationException();
         }
     }
 
